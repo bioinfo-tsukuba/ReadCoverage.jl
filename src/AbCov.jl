@@ -50,7 +50,17 @@ function bamToCoverage_cigarAware(pathBam::String, chrom::String, leftpos::Int64
     end
 end
 
-function abCov(path_bam, path_bed12, path_out; bin_size=100)
+"""
+	abCov(path_bam::String, path_bed12::String, path_out::String; bin_size::Int=100)
+Todo.
+Arguments
+---------
+- `path_bam`: Todo
+- `path_bed12`: Todo
+- `path_out`: Todo
+- `bin_size`: Todo
+"""
+function abCov(path_bam::String, path_bed12::String, path_out::String; bin_size::Int=100)
 
 	println(@sprintf "bam: %s\nbed12: %s\npath_out: %s\nbin_size: %d" path_bam path_bed12 path_out bin_size)
 
