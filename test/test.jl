@@ -1,4 +1,4 @@
-include("AbCov.jl")
+include("../src/AbCov.jl")
 
 
 path_bam = "/Users/haruka/RamDA_10pg_12.4M.1.uniq.proper_pair.bam"
