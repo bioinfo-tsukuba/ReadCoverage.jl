@@ -14,10 +14,17 @@ using Printf
 
 
 # CAUTION: No strandness
+"""
+	Generates read coverage for a genomic interval.
+	Both `leftpos` and `rightpos` coordinates are assumed to be 1-based.
+"""
 function bamToCoverage_cigarAware_base(bamReader::BAM.Reader, chrom::String, leftpos::Int64, rightpos::Int64)
+	# Define output read coverage container
 	coverage = zeros(Int, rightpos - leftpos + 1)
+
+	# Evaluate each BAM record
 	for record in eachoverlap(bamReader, chrom, leftpos:rightpos)
-		# skip
+		# Skip a BAM record for an unmapped read
 		if ! BAM.ismapped(record)
 			continue
 		end
@@ -26,6 +33,7 @@ function bamToCoverage_cigarAware_base(bamReader::BAM.Reader, chrom::String, lef
 		cigarRle = BAM.cigar_rle(record)
 		offset = 0
 
+		# Decode CIGAR string to get coverage of split-aligned reads
 		for i in 1:length(cigarRle[1])
 			if cigarRle[1][i] == OP_MATCH
 				if leftpos <= readLeftPos + offset <= rightpos
@@ -41,6 +49,7 @@ function bamToCoverage_cigarAware_base(bamReader::BAM.Reader, chrom::String, lef
 			offset += cigarRle[2][i]
 		end
 	end
+	
 	return(coverage)
 end
 
@@ -49,6 +58,7 @@ function bamToCoverage_cigarAware(pathBam::String, chrom::String, leftpos::Int64
         return(bamToCoverage_cigarAware_base(reader, chrom, leftpos, rightpos))
     end
 end
+
 
 """
 	abCov(path_bam::String, path_bed12::String, path_out::String; bin_size::Int=100)
