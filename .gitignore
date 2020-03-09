@@ -1,2 +1,6 @@
 .DS_Store
 TODOs.md
+test_out/
+test/*.sh
+test/*.py
+test/*.R
