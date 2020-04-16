@@ -2,17 +2,17 @@
 
 
 """
-	abCov(path_bam::String, path_bed12::String, path_out::String; bin_size::Int=100)
+	abCov(path_bam::String, path_bed12::String, path_prefix::String; bin_size::Int=100)
 Todo.
 Arguments
 ---------
 - `path_bam`: Todo
 - `path_bed12`: Todo
-- `path_out`: Todo
+- `path_prefix`: Todo
 - `bin_size`: Todo
 """
-function abCov(path_bam::String, path_bed12::String, path_out::String; bin_size::Int=100)
-
+function abCov(path_bam::String, path_bed12::String, path_prefix::String; bin_size::Int=100)
+	path_out = path_prefix * ".absoluteGeneBodyCoverage.txt"
 	println(@sprintf "bam: %s\nbed12: %s\npath_out: %s\nbin_size: %d" path_bam path_bed12 path_out bin_size)
 
 	# Load transcripts information (BED12)
@@ -133,7 +133,10 @@ function abCov(path_bam::String, path_bed12::String, path_out::String; bin_size:
 	binEnds = binNumbers .* bin_size
 	open(path_out, "w") do io
            writedlm(io, [binNumbers binStarts binEnds abcov N_transcript], '\t')
-    end
+	end
+	
+	# Save plot
+	plot_absolute_coverage(abcov, out_path=path_prefix * ".absoluteGeneBodyCoverage.pdf")
 
     return(abcov)
 end
