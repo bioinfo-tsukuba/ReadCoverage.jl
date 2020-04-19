@@ -1,8 +1,3 @@
-using Plots
-using PyPlot
-pyplot()
-
-
 """
 	Plot absolute genebody coverage
 """
