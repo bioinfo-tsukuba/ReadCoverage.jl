@@ -110,7 +110,7 @@ function absolute_genebodycoverage(path_bam::String, path_bed12::String, output_
 					continue
 				end
 
-				cov[pos_cov] = readcoverage_bam(bam_reader, BED.chrom(t), exon_start, exon_end)
+				cov[pos_cov] = readcoverage_bam_base(bam_reader, BED.chrom(t), exon_start, exon_end)
 			end
 
 			# Calculate count per bin

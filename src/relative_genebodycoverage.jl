@@ -94,7 +94,7 @@ function coverage_transcript_percentile(bam_reader::BAM.Reader, t::BED.Record)
 		percentile_positions = reverse(percentile_positions)
 	end
 	
-	return readcoverage_bam(bam_reader, BED.chrom(t), transcript_start, transcript_end)[percentile_positions]
+	return readcoverage_bam_base(bam_reader, BED.chrom(t), transcript_start, transcript_end)[percentile_positions]
 end
 
 
