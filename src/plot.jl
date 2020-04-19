@@ -1,3 +1,5 @@
+export plot_absolute_coverage, plot_relative_coverage, plot_read_coverage
+
 """
 	Plot absolute genebody coverage
 """

@@ -1,3 +1,4 @@
+export relative_genebodycoverage
 
 """
 	Calculstes relative gene body coverage

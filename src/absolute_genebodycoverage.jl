@@ -1,8 +1,7 @@
-
-
+export absolute_genebodycoverage
 
 """
-	abCov(path_bam::String, path_bed12::String, output_prefix::String; bin_size::Int=100)
+absolute_genebodycoverage(path_bam::String, path_bed12::String, output_prefix::String; bin_size::Int=100)
 Todo.
 Arguments
 ---------

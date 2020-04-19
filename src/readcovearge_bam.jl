@@ -1,3 +1,5 @@
+export bamToCoverage_cigarAware_base
+
 """
 	Generates read coverage for a genomic interval.
 	Both `leftpos` and `rightpos` coordinates are assumed to be 1-based.
