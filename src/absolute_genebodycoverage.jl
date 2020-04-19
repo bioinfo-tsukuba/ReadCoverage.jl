@@ -22,7 +22,7 @@ function absolute_genebodycoverage(path_bam::String, path_bed12::String, output_
 		error(@sprintf "No such file: %s\n" path_bed12)
 	end
 	if !uv_access_writable(dirname(output_prefix))
-		error(@sprintf "The output file are not writable: %s\n" output_prefix)
+		error(@sprintf "Output files are not writable to: %s\n" (dirname(output_prefix) != "" ? dirname(output_prefix) : "."))
 	end
 
 	# Load transcripts information (BED12)
