@@ -94,7 +94,7 @@ function coverage_transcript_percentile(bam_reader::BAM.Reader, t::BED.Record)
 		percentile_positions = reverse(percentile_positions)
 	end
 	
-	return bamToCoverage_cigarAware_base(bam_reader, BED.chrom(t), transcript_start, transcript_end)[percentile_positions]
+	return readcoverage_bam(bam_reader, BED.chrom(t), transcript_start, transcript_end)[percentile_positions]
 end
 
 
@@ -153,73 +153,4 @@ function percentile_list(N::Array{Int,1})
 	end
 
 	return percentile
-end
-
-
-"""
-@deprectate
-	# Gets read coverage on the percentile positions in a transcript
-"""
-function coverage_transcript_percentile_old(bam_reader::BAM.Reader, t::BED.Record)
-	# Get blockSizes (= exon lengths) and blockStarts (=start position of exons relative to chromStart of t)
-	blockSizes = BED.blocksizes(t)
-	L = sum(blockSizes)
-
-	# Select percentile positions (resulting in 100 positions)
-	percentile_indexes = percentile_list(collect(1:L))
-
-	# Note: Read coverage is saved in `cov` in a 'Left justified' manner,
-	#       and left is 5'-end.
-	# If the strand of a transcript is '-' STRAND_NEG, read coverage was reversed.
-	if BED.strand(t) == STRAND_NEG
-		percentile_indexes = reverse(percentile_indexes)
-	end
-
-	return coverage_transcript(bam_reader, t)[percentile_indexes]
-end
-
-
-
-"""
-@deprectate
-	Gets read coverage on the percentile positions in a transcript
-"""
-function coverage_transcript_percentile_eachtime(bam_reader::BAM.Reader, t::BED.Record)
-	# Get blockSizes (= exon lengths) and blockStarts (=start position of exons relative to chromStart of t)
-	blockSizes = BED.blocksizes(t)
-	blockStarts = BED.blockstarts(t)
-	s_g = BED.chromstart(t) + 1
-	L = sum(blockSizes)
-
-	coverage = zeros(Float64, 100)
-
-	# Collect genomic positions on exons
-	exon_coordinates = zeros(Int, L)
-	offset = 0
-	for i in 1:length(blockSizes) # For each exon
-		s_g = blockStarts[i] + s_g
-		for j in 0:(blockSizes[i]-1)
-			exon_coordinates[j+offset+1] = s_g + j
-		end
-		offset += blockSizes[i]
-	end
-
-	# Select percentile positions (resulting in 100 positions)
-	percentile_positions = percentile_list(exon_coordinates)
-
-	# Note: Read coverage is saved in `cov` in a 'Left justified' manner,
-	#       and left is 5'-end.
-	# If the strand of a transcript is '-' STRAND_NEG, read coverage was reversed.
-	if BED.strand(t) == STRAND_NEG
-		percentile_positions = reverse(percentile_positions) .- 1
-	end
-
-	pos = 0
-	for i in 1:length(percentile_positions) # == 1:100
-		pos = percentile_positions[i]
-		# Get read coverage for the percentile positions
-		coverage[i] = bamToCoverage_cigarAware_base(bam_reader, BED.chrom(t), pos, pos)[1]
-	end
-
-	return(coverage)
 end

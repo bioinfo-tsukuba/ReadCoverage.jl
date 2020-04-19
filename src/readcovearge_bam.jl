@@ -1,10 +1,11 @@
-export bamToCoverage_cigarAware_base
+export readcoverage_bam
+export readcoverage_transcript_bam
 
 """
 	Generates read coverage for a genomic interval.
 	Both `leftpos` and `rightpos` coordinates are assumed to be 1-based.
 """
-function bamToCoverage_cigarAware_base(bamReader::BAM.Reader, chrom::String, leftpos::Int64, rightpos::Int64)
+function readcoverage_bam(bamReader::BAM.Reader, chrom::String, leftpos::Int64, rightpos::Int64)
 	# Define output read coverage container
 	coverage = zeros(Int, rightpos - leftpos + 1)
 
@@ -54,22 +55,9 @@ end
 
 
 """
-@deprectate
-"""
-function bamToCoverage_cigarAware(path_bam::String, chrom::String, leftpos::Int64, rightpos::Int64)
-    open(BAM.Reader, path_bam, index=path_bam*".bai") do reader
-        return(bamToCoverage_cigarAware_base(reader, chrom, leftpos, rightpos))
-    end
-end
-
-
-
-
-
-"""
 	Returns read coverage for a transcript
 """
-function coverage_transcript(bam_reader::BAM.Reader, t::BED.Record)
+function readcoverage_transcript_bam(bam_reader::BAM.Reader, t::BED.Record)
 	# Get blockSizes (= exon lengths) and blockStarts (=start position of exons relative to chromStart of t)
 	blockSizes = BED.blocksizes(t)
 	L = sum(blockSizes)
@@ -104,45 +92,8 @@ function coverage_transcript(bam_reader::BAM.Reader, t::BED.Record)
 			continue
 		end
 
-		coverage[pos_cov] = bamToCoverage_cigarAware_base(bam_reader, BED.chrom(t), s_g, e_g)
+		coverage[pos_cov] = readcoverage_bam(bam_reader, BED.chrom(t), s_g, e_g)
 	end
 
 	return(coverage)
 end
-
-
-
-
-"""
-@deprectate
-Test
-"""
-function bamToCoverage_cigarAware_position(bamReader::BAM.Reader, chrom::String, pos::Int64)
-	coverage = 0
-
-	# Evaluate each BAM record
-	for record in eachoverlap(bamReader, chrom, pos:pos)
-		# Skip a BAM record for an unmapped read
-		if ! BAM.ismapped(record)
-			continue
-		end
-
-		readLeftPos = BAM.position(record)
-		cigarRle = BAM.cigar_rle(record)
-		offset = 0
-
-		# Decode CIGAR string to get coverage of split-aligned reads
-		for i in 1:length(cigarRle[1])
-			if cigarRle[1][i] == OP_MATCH
-				if readLeftPos + offset <= pos && pos <= readLeftPos + offset + cigarRle[2][i] - 1
-					coverage += 1
-				end
-			end
-			offset += cigarRle[2][i]
-		end
-	end
-
-	return(coverage)
-end
-
-
