@@ -6,7 +6,6 @@ using DelimitedFiles
 using Printf
 using Plots
 using PyPlot
-pyplot()
 
 include("relative_genebodycoverage.jl")
 include("readcovearge_bam.jl")
