@@ -6,6 +6,17 @@ function relative_genebodycoverage(path_bam::String, path_bed12::String, output_
 	path_out = output_prefix * ".geneBodyCoverage.txt"
 	println(@sprintf "bam: %s\nbed12: %s\npath_out: %s\ntranscript_length_cut: %d" path_bam path_bed12 path_out transcript_length_cut)
 
+	# File check
+	if !isfile(path_bam)
+		error(@sprintf "No such file: %s\n" path_bam)
+	end
+	if !isfile(path_bed12)
+		error(@sprintf "No such file: %s\n" path_bed12)
+	end
+	if !uv_access_writable(dirname(output_prefix))
+		error(@sprintf "The output file are not writable: %s\n" output_prefix)
+	end
+
 	N_bin = 100
 
 	# Loads transcripts information from BED12-format file

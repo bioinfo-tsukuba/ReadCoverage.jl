@@ -2,18 +2,29 @@
 
 
 """
-	abCov(path_bam::String, path_bed12::String, path_prefix::String; bin_size::Int=100)
+	abCov(path_bam::String, path_bed12::String, output_prefix::String; bin_size::Int=100)
 Todo.
 Arguments
 ---------
 - `path_bam`: Todo
 - `path_bed12`: Todo
-- `path_prefix`: Todo
+- `output_prefix`: Todo
 - `bin_size`: Todo
 """
-function abCov(path_bam::String, path_bed12::String, path_prefix::String; bin_size::Int=100)
-	path_out = path_prefix * ".absoluteGeneBodyCoverage.txt"
+function absolute_genebodycoverage(path_bam::String, path_bed12::String, output_prefix::String; bin_size::Int=100)
+	path_out = output_prefix * ".absoluteGeneBodyCoverage.txt"
 	println(@sprintf "bam: %s\nbed12: %s\npath_out: %s\nbin_size: %d" path_bam path_bed12 path_out bin_size)
+
+	# File check
+	if !isfile(path_bam)
+		error(@sprintf "No such file: %s\n" path_bam)
+	end
+	if !isfile(path_bed12)
+		error(@sprintf "No such file: %s\n" path_bed12)
+	end
+	if !uv_access_writable(dirname(output_prefix))
+		error(@sprintf "The output file are not writable: %s\n" output_prefix)
+	end
 
 	# Load transcripts information (BED12)
 	transcripts = Array{BED.Record,1}()
@@ -136,7 +147,7 @@ function abCov(path_bam::String, path_bed12::String, path_prefix::String; bin_si
 	end
 	
 	# Save plot
-	plot_absolute_coverage(abcov, out_path=path_prefix * ".absoluteGeneBodyCoverage.pdf")
+	plot_absolute_coverage(abcov, out_path=output_prefix * ".absoluteGeneBodyCoverage.pdf")
 
     return(abcov)
 end
