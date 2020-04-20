@@ -3,3 +3,6 @@ TODOs.md
 labnotebook.md
 zzz_experiments/
 examples/data/
+*.bam
+*.bam.bai
+*.bed
