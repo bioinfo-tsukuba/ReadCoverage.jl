@@ -2,8 +2,17 @@ export relative_genebodycoverage
 
 """
 	Calculstes relative gene body coverage
+	Todo.
+Arguments
+---------
+- `path_bam`: Todo
+- `path_bed12`: Todo
+- `output_prefix`: If this keyword is not specified or set to "" (defalut), no output files are saved.
+- `transcript_length_cut`
+- `bin_size`: Todo
+- `N_bin`:
 """
-function relative_genebodycoverage(path_bam::String, path_bed12::String; output_prefix::String="", transcript_length_cut::Int=100, max_depth::Int=0; N_bin::Int = 100)
+function relative_genebodycoverage(path_bam::String, path_bed12::String; output_prefix::String="", transcript_length_cut::Int=100, max_depth::Int=0, N_bin::Int = 100)
 	if output_prefix != ""
 		path_out = output_prefix * ".geneBodyCoverage.txt"
 		path_out_plot = output_prefix * ".geneBodyCoverage.pdf"
