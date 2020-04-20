@@ -5,7 +5,8 @@ export relative_genebodycoverage
 """
 function relative_genebodycoverage(path_bam::String, path_bed12::String, output_prefix::String; transcript_length_cut::Int=100, max_depth::Int=0)
 	path_out = output_prefix * ".geneBodyCoverage.txt"
-	println(@sprintf "bam: %s\nbed12: %s\npath_out: %s\ntranscript_length_cut: %d" path_bam path_bed12 path_out transcript_length_cut)
+	path_out_plot = output_prefix * ".geneBodyCoverage.pdf"
+	println(@sprintf "Start calculating relative gene body coverage...\n- bam: %s\n- bed12: %s\n- output: %s\n          %s\n- ntranscript_length_cut: %d\n" path_bam path_bed12 path_out path_out_plot transcript_length_cut)
 
 	# File check
 	if !isfile(path_bam)
@@ -56,7 +57,10 @@ function relative_genebodycoverage(path_bam::String, path_bed12::String, output_
 	write_relative_genebodycoverage(relcov, path_out, sample_id)
 
 	# Save plot
-	plot_relative_coverage(relcov, out_path=output_prefix * ".geneBodyCoverage.pdf")
+	plot_relative_coverage(relcov, out_path=path_out_plot)
+
+	# Message
+	println(@sprintf "Finished! Check output files:\n- %s\n- %s" path_out path_out_plot)
 
 	return relcov
 end

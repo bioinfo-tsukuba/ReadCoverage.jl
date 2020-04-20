@@ -12,7 +12,8 @@ Arguments
 """
 function absolute_genebodycoverage(path_bam::String, path_bed12::String, output_prefix::String; bin_size::Int=100)
 	path_out = output_prefix * ".absoluteGeneBodyCoverage.txt"
-	println(@sprintf "bam: %s\nbed12: %s\npath_out: %s\nbin_size: %d" path_bam path_bed12 path_out bin_size)
+	path_out_plot = output_prefix * ".absoluteGeneBodyCoverage.pdf"
+	println(@sprintf "Start calculating absolute gene body coverage...\n- bam: %s\n- bed12: %s\n- output: %s\n          %s\n- bin_size: %d\n" path_bam path_bed12 path_out path_out_plot bin_size)
 
 	# File check
 	if !isfile(path_bam)
@@ -146,7 +147,10 @@ function absolute_genebodycoverage(path_bam::String, path_bed12::String, output_
 	end
 	
 	# Save plot
-	plot_absolute_coverage(abcov, out_path=output_prefix * ".absoluteGeneBodyCoverage.pdf")
+	plot_absolute_coverage(abcov, out_path=path_out_plot)
+
+	# Message
+	println(@sprintf "Finished! Check output files:\n- %s\n- %s" path_out path_out_plot)
 
     return(abcov)
 end
