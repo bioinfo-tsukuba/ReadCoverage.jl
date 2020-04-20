@@ -1,7 +1,4 @@
 .DS_Store
 TODOs.md
 labnotebook.md
-test_out/
-test/*.sh
-test/*.py
-test/*.R
+zzz_experiments/
