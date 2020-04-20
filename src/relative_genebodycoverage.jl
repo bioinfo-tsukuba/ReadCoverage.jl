@@ -3,10 +3,12 @@ export relative_genebodycoverage
 """
 	Calculstes relative gene body coverage
 """
-function relative_genebodycoverage(path_bam::String, path_bed12::String, output_prefix::String; transcript_length_cut::Int=100, max_depth::Int=0)
-	path_out = output_prefix * ".geneBodyCoverage.txt"
-	path_out_plot = output_prefix * ".geneBodyCoverage.pdf"
-	println(@sprintf "Start calculating relative gene body coverage...\n- bam: %s\n- bed12: %s\n- output: %s\n          %s\n- ntranscript_length_cut: %d\n" path_bam path_bed12 path_out path_out_plot transcript_length_cut)
+function relative_genebodycoverage(path_bam::String, path_bed12::String; output_prefix::String="", transcript_length_cut::Int=100, max_depth::Int=0; N_bin::Int = 100)
+	if output_prefix != ""
+		path_out = output_prefix * ".geneBodyCoverage.txt"
+		path_out_plot = output_prefix * ".geneBodyCoverage.pdf"
+		println(@sprintf "Start calculating relative gene body coverage...\n- bam: %s\n- bed12: %s\n- output: %s\n          %s\n- ntranscript_length_cut: %d\n" path_bam path_bed12 path_out path_out_plot transcript_length_cut)
+	end
 
 	# File check
 	if !isfile(path_bam)
@@ -15,11 +17,11 @@ function relative_genebodycoverage(path_bam::String, path_bed12::String, output_
 	if !isfile(path_bed12)
 		error(@sprintf "No such file: %s\n" path_bed12)
 	end
-	if !uv_access_writable(dirname(output_prefix))
-		error(@sprintf "Output files are not writable to: %s\n" (dirname(output_prefix) != "" ? dirname(output_prefix) : "."))
+	if output_prefix != ""
+		if !uv_access_writable(dirname(output_prefix))
+			error(@sprintf "Output files are not writable to: %s\n" (dirname(output_prefix) != "" ? dirname(output_prefix) : "."))
+		end
 	end
-
-	N_bin = 100
 
 	# Loads transcripts information from BED12-format file
 	transcripts = load_transcript(path_bed12)
@@ -52,15 +54,17 @@ function relative_genebodycoverage(path_bam::String, path_bed12::String, output_
 		end
     end
 
-	# Write result
-	sample_id = replace(basename(path_bam), r"\.[^\.]+$" => s"")
-	write_relative_genebodycoverage(relcov, path_out, sample_id)
+	if output_prefix != ""
+		# Write result
+		sample_id = replace(basename(path_bam), r"\.[^\.]+$" => s"")
+		write_relative_genebodycoverage(relcov, path_out, sample_id)
 
-	# Save plot
-	plot_relative_coverage(relcov, out_path=path_out_plot)
-
-	# Message
-	println(@sprintf "Finished! Check output files:\n- %s\n- %s" path_out path_out_plot)
+		# Save plot
+		plot_relative_coverage(relcov, out_path=path_out_plot)
+	
+		# Message
+		println(@sprintf "Finished! Check output files:\n- %s\n- %s" path_out path_out_plot)
+	end
 
 	return relcov
 end

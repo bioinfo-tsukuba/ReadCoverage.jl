@@ -1,19 +1,21 @@
 export absolute_genebodycoverage
 
 """
-absolute_genebodycoverage(path_bam::String, path_bed12::String, output_prefix::String; bin_size::Int=100)
+absolute_genebodycoverage(path_bam::String, path_bed12::String; output_prefix::String="", bin_size::Int=100)
 Todo.
 Arguments
 ---------
 - `path_bam`: Todo
 - `path_bed12`: Todo
-- `output_prefix`: Todo
+- `output_prefix`: If this keyword is not specified or set to "" (defalut), no output files are saved.
 - `bin_size`: Todo
 """
-function absolute_genebodycoverage(path_bam::String, path_bed12::String, output_prefix::String; bin_size::Int=100)
-	path_out = output_prefix * ".absoluteGeneBodyCoverage.txt"
-	path_out_plot = output_prefix * ".absoluteGeneBodyCoverage.pdf"
-	println(@sprintf "Start calculating absolute gene body coverage...\n- bam: %s\n- bed12: %s\n- output: %s\n          %s\n- bin_size: %d\n" path_bam path_bed12 path_out path_out_plot bin_size)
+function absolute_genebodycoverage(path_bam::String, path_bed12::String; output_prefix::String = "", bin_size::Int=100)
+	if output_prefix != ""
+		path_out = output_prefix * ".absoluteGeneBodyCoverage.txt"
+		path_out_plot = output_prefix * ".absoluteGeneBodyCoverage.pdf"
+		println(@sprintf "Start calculating absolute gene body coverage...\n- bam: %s\n- bed12: %s\n- output: %s\n          %s\n- bin_size: %d\n" path_bam path_bed12 path_out path_out_plot bin_size)
+	end
 
 	# File check
 	if !isfile(path_bam)
@@ -22,8 +24,10 @@ function absolute_genebodycoverage(path_bam::String, path_bed12::String, output_
 	if !isfile(path_bed12)
 		error(@sprintf "No such file: %s\n" path_bed12)
 	end
-	if !uv_access_writable(dirname(output_prefix))
-		error(@sprintf "Output files are not writable to: %s\n" (dirname(output_prefix) != "" ? dirname(output_prefix) : "."))
+	if output_prefix != ""
+		if !uv_access_writable(dirname(output_prefix))
+			error(@sprintf "Output files are not writable to: %s\n" (dirname(output_prefix) != "" ? dirname(output_prefix) : "."))
+		end
 	end
 
 	# Load transcripts information (BED12)
@@ -137,20 +141,22 @@ function absolute_genebodycoverage(path_bam::String, path_bed12::String, output_
 		abcov[k] = abcov[k] / N_transcript[k]
 	end
 
-	# Write output (TSV) (Sample_ID, Bin, Coverage)
-	println("Write results...")
-	binNumbers = collect(1:K)
-	binStarts = (binNumbers .- 1) .* bin_size .+ 1
-	binEnds = binNumbers .* bin_size
-	open(path_out, "w") do io
-           writedlm(io, [binNumbers binStarts binEnds abcov N_transcript], '\t')
+	if output_prefix != ""
+		# Write output (TSV) (Sample_ID, Bin, Coverage)
+		println("Write results...")
+		binNumbers = collect(1:K)
+		binStarts = (binNumbers .- 1) .* bin_size .+ 1
+		binEnds = binNumbers .* bin_size
+		open(path_out, "w") do io
+			writedlm(io, [binNumbers binStarts binEnds abcov N_transcript], '\t')
+		end
+		
+		# Save plot
+		plot_absolute_coverage(abcov, out_path=path_out_plot)
+
+		# Message
+		println(@sprintf "Finished! Check output files:\n- %s\n- %s" path_out path_out_plot)
 	end
 	
-	# Save plot
-	plot_absolute_coverage(abcov, out_path=path_out_plot)
-
-	# Message
-	println(@sprintf "Finished! Check output files:\n- %s\n- %s" path_out path_out_plot)
-
     return(abcov)
 end
