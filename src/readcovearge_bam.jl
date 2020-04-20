@@ -1,8 +1,19 @@
 export readcoverage_bam
 export readcoverage_transcript_bam
 
-
 """
+readcoverage_bam(path_bam::String, chrom::String, leftpos::Int64, rightpos::Int64;
+					output_prefix::String = "")
+
+Calculates read coverage for a genomic interval.
+
+Arguments
+---------
+- `path_bam::String`: Path to a BAM file.
+- `chrom::String`: Chromosome name for a genomic interval.
+- `leftpos::Int64`: Left position for a genomic interval.
+- `rightpos::Int64`: Right position for a genomic interval.
+- `output_prefix::String`: Prefix for output files. If this keyword is not specified or set to "" (defalut), no output files are saved.
 """
 function readcoverage_bam(path_bam::String, chrom::String, leftpos::Int64, rightpos::Int64; output_prefix::String = "")
 	if output_prefix != ""
@@ -102,7 +113,9 @@ end
 
 
 """
-	Returns read coverage for a transcript
+readcoverage_transcript_bam(bam_reader::BAM.Reader, t::BED.Record)
+
+Returns read coverage for a transcript.
 """
 function readcoverage_transcript_bam(bam_reader::BAM.Reader, t::BED.Record)
 	# Get blockSizes (= exon lengths) and blockStarts (=start position of exons relative to chromStart of t)

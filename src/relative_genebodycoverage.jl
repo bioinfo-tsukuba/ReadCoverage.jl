@@ -1,22 +1,27 @@
 export relative_genebodycoverage
 
 """
-	Calculstes relative gene body coverage
-	Todo.
+relative_genebodycoverage(path_bam::String, path_bed12::String; 
+							output_prefix::String="", transcript_length_cut::Int=100, max_depth::Int=0, N_bin::Int = 100)
+
+Calculates relative gene body coverage.
+
 Arguments
 ---------
-- `path_bam`: Todo
-- `path_bed12`: Todo
-- `output_prefix`: If this keyword is not specified or set to "" (defalut), no output files are saved.
-- `transcript_length_cut`
-- `bin_size`: Todo
-- `N_bin`:
+- `path_bam::String`: Path to a BAM file.
+- `path_bed12::String`: Path to a reference gene model file with BED12 format.
+- `output_prefix::String`: Prefix for output files. If this keyword is not specified or set to "" (defalut), no output files are saved.
+- `transcript_length_cut`: Minimum length of transcripts to be used for calculation (Defalut: 100)
+- `max_depth::Int`: Maximum depth for a position. Depth more than `max_depth` is cut to `max_depth`.
+					If this keyword is set to 0 (defalut), no cut is occurred.
+- `N_bin::Int`: Number of bins for a transcript (Defalut: 100).
 """
-function relative_genebodycoverage(path_bam::String, path_bed12::String; output_prefix::String="", transcript_length_cut::Int=100, max_depth::Int=0, N_bin::Int = 100)
+function relative_genebodycoverage(path_bam::String, path_bed12::String; 
+									output_prefix::String="", transcript_length_cut::Int=100, max_depth::Int=0, N_bin::Int = 100)
 	if output_prefix != ""
 		path_out = output_prefix * ".geneBodyCoverage.txt"
 		path_out_plot = output_prefix * ".geneBodyCoverage.pdf"
-		println(@sprintf "Start calculating relative gene body coverage...\n- bam: %s\n- bed12: %s\n- output: %s\n          %s\n- ntranscript_length_cut: %d\n" path_bam path_bed12 path_out path_out_plot transcript_length_cut)
+		println(@sprintf "Start calculating relative gene body coverage...\n- bam: %s\n- bed12: %s\n- output: %s\n          %s\n- transcript_length_cut: %d\n- max_depth: %d\n- N_bin: %d\n" path_bam path_bed12 path_out path_out_plot transcript_length_cut max_depth N_bin)
 	end
 
 	# File check

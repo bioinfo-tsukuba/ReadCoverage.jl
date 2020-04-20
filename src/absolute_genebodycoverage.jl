@@ -1,16 +1,20 @@
 export absolute_genebodycoverage
 
 """
-absolute_genebodycoverage(path_bam::String, path_bed12::String; output_prefix::String="", bin_size::Int=100)
-Todo.
+absolute_genebodycoverage(path_bam::String, path_bed12::String;
+							output_prefix::String = "", bin_size::Int=100)
+
+Calculates absolute gene body coverage.
+
 Arguments
 ---------
-- `path_bam`: Todo
-- `path_bed12`: Todo
-- `output_prefix`: If this keyword is not specified or set to "" (defalut), no output files are saved.
-- `bin_size`: Todo
+- `path_bam::String`: Path to a BAM file.
+- `path_bed12::String`: Path to a reference gene model file with BED12 format.
+- `output_prefix::String`: Prefix for output files. If this keyword is not specified or set to "" (defalut), no output files are saved.
+- `bin_size::Int`: Bin size for transcripts (Defalut: 100).
 """
-function absolute_genebodycoverage(path_bam::String, path_bed12::String; output_prefix::String = "", bin_size::Int=100)
+function absolute_genebodycoverage(path_bam::String, path_bed12::String;
+									output_prefix::String = "", bin_size::Int=100)
 	if output_prefix != ""
 		path_out = output_prefix * ".absoluteGeneBodyCoverage.txt"
 		path_out_plot = output_prefix * ".absoluteGeneBodyCoverage.pdf"
