@@ -1,2 +1,0 @@
-*.bam filter=lfs diff=lfs merge=lfs -text
-examples/RamDA_72h_A09.uniq.q40.bam filter=lfs diff=lfs merge=lfs -text
