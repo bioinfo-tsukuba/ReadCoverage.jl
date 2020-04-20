@@ -19,6 +19,6 @@ end
 """
 Cacluates absolute gene body coverage from a BAM file
 """
-@main function coverage(path_bam::String, chrom::String, leftpos::Int64, rightpos::Int64; out::String)
+@main function coverage(path_bam::String, chrom::String, leftpos::Int64, rightpos::Int64, out::String)
     readcoverage_bam(path_bam, chrom, leftpos, rightpos, output_prefix=out);
 end
