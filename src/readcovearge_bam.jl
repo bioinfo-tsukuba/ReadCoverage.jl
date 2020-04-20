@@ -1,6 +1,53 @@
 export readcoverage_bam
 export readcoverage_transcript_bam
 
+
+"""
+"""
+function readcoverage_bam(path_bam::String, chrom::String, leftpos::Int64, rightpos::Int64; output_prefix::String = "")
+	if output_prefix != ""
+		path_out = output_prefix * ".readCoverage.txt"
+		path_out_plot = output_prefix * ".readCoverage.pdf"
+		println(@sprintf "Start calculating read coverage...\n- bam: %s\n- output: %s\n          %s\n" path_bam path_out path_out_plot)
+	end
+
+	# File check
+	if !isfile(path_bam)
+		error(@sprintf "No such file: %s\n" path_bam)
+	end
+	if output_prefix != ""
+		if !uv_access_writable(dirname(output_prefix))
+			error(@sprintf "Output files are not writable to: %s\n" (dirname(output_prefix) != "" ? dirname(output_prefix) : "."))
+		end
+	end
+
+	# Define output read coverage container
+	coverage = zeros(Int, rightpos - leftpos + 1)
+
+	# Caclutate read coverage
+    open(BAM.Reader, path_bam, index=path_bam*".bai") do reader
+        coverage = readcoverage_bam_base(reader, chrom, leftpos, rightpos)
+	end
+	
+	if output_prefix != ""
+		# Write output (TSV) (Position, Coverage)
+		println("Write results...")
+		binNumbers = collect(leftpos:rightpos)
+		open(path_out, "w") do io
+			writedlm(io, [binNumbers coverage], '\t')
+		end
+		
+		# Save plot
+		plot_read_coverage(coverage, out_path=path_out_plot)
+
+		# Message
+		println(@sprintf "Finished! Check output files:\n- %s\n- %s" path_out path_out_plot)
+	end
+
+	return(coverage)
+end
+
+
 """
 	Generates read coverage for a genomic interval.
 	Both `leftpos` and `rightpos` coordinates are assumed to be 1-based.
@@ -96,15 +143,6 @@ function readcoverage_transcript_bam(bam_reader::BAM.Reader, t::BED.Record)
 	end
 
 	return(coverage)
-end
-
-
-"""
-"""
-function readcoverage_bam(path_bam::String, chrom::String, leftpos::Int64, rightpos::Int64)
-    open(BAM.Reader, path_bam, index=path_bam*".bai") do reader
-        return(readcoverage_bam_base(reader, chrom, leftpos, rightpos))
-    end
 end
 
 
