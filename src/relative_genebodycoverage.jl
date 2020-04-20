@@ -3,7 +3,7 @@ export relative_genebodycoverage
 """
 	Calculstes relative gene body coverage
 """
-function relative_genebodycoverage(path_bam::String, path_bed12::String, output_prefix::String; transcript_length_cut::Int=100, max_depth=0)
+function relative_genebodycoverage(path_bam::String, path_bed12::String, output_prefix::String; transcript_length_cut::Int=100, max_depth::Int=0)
 	path_out = output_prefix * ".geneBodyCoverage.txt"
 	println(@sprintf "bam: %s\nbed12: %s\npath_out: %s\ntranscript_length_cut: %d" path_bam path_bed12 path_out transcript_length_cut)
 
