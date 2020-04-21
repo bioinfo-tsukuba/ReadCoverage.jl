@@ -11,10 +11,10 @@ function parse_commandline()
             help = "Calculates relative gene body coverage from a BAM file.\n(Almost same as genebody_coverage.py in RSeQC.)"
             action = :command        
         "abcov"
-            help = "Cacluates absolute gene body coverage from a BAM file            "
+            help = "Cacluates absolute gene body coverage from a BAM file."
             action = :command
         "coverage"    
-            help = "Cacluates absolute gene body coverage from a BAM file"
+            help = "Cacluates absolute gene body coverage from a BAM file."
             action = :command
     end
 
@@ -28,7 +28,7 @@ function parse_commandline()
             arg_type = String
             required = true
         "output_prefix"
-            help = "Prefix for output files. If not specified or set to "" (defalut), no output files are saved."
+            help = "Prefix for output files. If not specified or set to \"\" (defalut), no output files are saved."
             arg_type = String
             required = true
         "--max_depth"
@@ -47,7 +47,7 @@ function parse_commandline()
             arg_type = String
             required = true
         "output_prefix"
-            help = "refix for output files. If not specified or set to "" (defalut), no output files are saved."
+            help = "refix for output files. If not specified or set to \"\" (defalut), no output files are saved."
             arg_type = String
             required = true
         "--bin_size"
@@ -73,7 +73,7 @@ function parse_commandline()
             arg_type = Int64
             required = true
         "output_prefix"
-            help = "Prefix for output files. If not specified or set to "" (defalut), no output files are saved."
+            help = "Prefix for output files. If not specified or set to \"\" (defalut), no output files are saved."
             arg_type = String
             required = true
     end
