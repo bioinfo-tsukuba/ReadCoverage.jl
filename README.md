@@ -43,3 +43,9 @@ relcov = relative_genebodycoverage(path_bam, path_bed12, output_prefix=out_prefi
 plot_relative_coverage(relcov)
 ```
 
+### CLI (Commad line interface)
+
+```
+$ julia cli/run.jl relcov <BAM> <BED12> <output_prefix>
+```
+
