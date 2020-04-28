@@ -15,7 +15,7 @@ using ReadCoverage
 path_bam = "examples/RamDA_72h_A09.uniq.q40.bam"
 path_bed12 = "examples/gencode.vM15.primary_assembly.annotation.protein_coding.head.bed"
 out_prefix = "examples/out/RamDA_72h_A09.uniq.q40"
-
+```
 
 ### Read coverage
 
