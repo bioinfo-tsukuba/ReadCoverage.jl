@@ -2,6 +2,7 @@ module ReadCoverage
 
 using GenomicFeatures
 using XAM
+using BED
 using BioAlignments
 using DelimitedFiles
 using Printf
