@@ -1,7 +1,7 @@
 name = "ReadCoverage"
 uuid = "777a009e-283b-4c19-90b0-4d777a89162b"
 authors = ["Haruka Ozaki <harukao.cb@gmail.com>", "Tsubasa Takamuku <Tsubasa Takamuku h5gachapin1069@gmail.com>"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 BioAlignments = "00701ae9-d1dc-5365-b64a-a3a3ebf5695e"
