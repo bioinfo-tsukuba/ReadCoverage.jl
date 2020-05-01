@@ -2,7 +2,7 @@ export readcoverage_bam
 export readcoverage_transcript_bam
 
 """
-readcoverage_bam(path_bam::String, chrom::String, leftpos::Int64, rightpos::Int64;
+	readcoverage_bam(path_bam::String, chrom::String, leftpos::Int64, rightpos::Int64;
 					output_prefix::String = "")
 
 Calculates read coverage for a genomic interval.
@@ -36,8 +36,12 @@ function readcoverage_bam(path_bam::String, chrom::String, leftpos::Int64, right
 	coverage = zeros(Int, rightpos - leftpos + 1)
 
 	# Caclutate read coverage
-    open(BAM.Reader, path_bam, index=path_bam*".bai") do reader
-        coverage = readcoverage_bam_base(reader, chrom, leftpos, rightpos)
+	open(BAM.Reader, path_bam, index=path_bam*".bai") do bam_reader
+		# Check wheteher the region exists in BAM
+		if ! exists_region_bam(bam_reader, chrom, leftpos, rightpos)
+			error("The region does not exist in the BAM file.")
+		end
+        coverage = readcoverage_bam_base(bam_reader, chrom, leftpos, rightpos)
 	end
 	
 	if output_prefix != ""
@@ -60,15 +64,17 @@ end
 
 
 """
-	Generates read coverage for a genomic interval.
-	Both `leftpos` and `rightpos` coordinates are assumed to be 1-based.
+	readcoverage_bam_base(bam_reader::BAM.Reader, chrom::String, leftpos::Int64, rightpos::Int64)
+
+Generates read coverage for a genomic interval.
+Both `leftpos` and `rightpos` coordinates are assumed to be 1-based.
 """
-function readcoverage_bam_base(bamReader::BAM.Reader, chrom::String, leftpos::Int64, rightpos::Int64)
+function readcoverage_bam_base(bam_reader::BAM.Reader, chrom::String, leftpos::Int64, rightpos::Int64)
 	# Define output read coverage container
 	coverage = zeros(Int, rightpos - leftpos + 1)
 
 	# Evaluate each BAM record
-	for record in eachoverlap(bamReader, chrom, leftpos:rightpos)
+	for record in eachoverlap(bam_reader, chrom, leftpos:rightpos)
         # Skip a BAM record for an unmapped read (if pileupread.alignment.is_unmapped:continue)
 		if ! BAM.ismapped(record)
 			continue
@@ -113,11 +119,16 @@ end
 
 
 """
-readcoverage_transcript_bam(bam_reader::BAM.Reader, t::BED.Record)
+	readcoverage_transcript_bam(bam_reader::BAM.Reader, t::BED.Record)
 
 Returns read coverage for a transcript.
 """
 function readcoverage_transcript_bam(bam_reader::BAM.Reader, t::BED.Record)
+	# Check if the region of the transcript exists in BAM
+	if ! exists_region_bam(bam_reader, BED.chrom(t), BED.chromstart(t), BED.chromend(t))
+		error("The transcript region does not exist in the BAM file.")
+	end
+
 	# Get blockSizes (= exon lengths) and blockStarts (=start position of exons relative to chromStart of t)
 	blockSizes = BED.blocksizes(t)
 	L = sum(blockSizes)
@@ -160,13 +171,13 @@ end
 
 
 """
-Test
+For test
 """
-function bamToCoverage_cigarAware_position(bamReader::BAM.Reader, chrom::String, pos::Int64)
+function bamToCoverage_cigarAware_position(bam_reader::BAM.Reader, chrom::String, pos::Int64)
 	coverage = 0
 
 	# Evaluate each BAM record
-	for record in eachoverlap(bamReader, chrom, pos:pos)
+	for record in eachoverlap(bam_reader, chrom, pos:pos)
 		# Skip a BAM record for an unmapped read
 		if ! BAM.ismapped(record)
 			continue
@@ -191,3 +202,18 @@ function bamToCoverage_cigarAware_position(bamReader::BAM.Reader, chrom::String,
 end
 
 
+"""
+	exists_region_bam(bam_reader::BAM.Reader, chrom::String, leftpos::Int64, rightpos::Int64)
+
+Returns true if a region chrom:leftpos-rightpos exists in a BAM file for which a reader is opened.
+"""
+function exists_region_bam(bam_reader::BAM.Reader, chrom::String, leftpos::Int64, rightpos::Int64)::Bool
+	if in(chrom, bam_reader.refseqnames) &&
+			leftpos <= rightpos &&
+			leftpos >= 0 &&
+			rightpos <= bam_reader.refseqlens[findfirst(isequal(chrom), bam_reader.refseqnames)]
+		return true
+	else
+		return false
+	end
+end

@@ -45,7 +45,7 @@ function relative_genebodycoverage(path_bam::String, path_bed12::String;
 	relcov = zeros(Float64, N_bin)
 
 	# Open BAM file
-	open(BAM.Reader, path_bam, index=path_bam*".bai") do reader
+	open(BAM.Reader, path_bam, index=path_bam*".bai") do bam_reader
 
 		# For each transcript
 		for t in transcripts
@@ -58,12 +58,17 @@ function relative_genebodycoverage(path_bam::String, path_bed12::String;
 				continue
 			end
 
+			# Skip the transcript whose region does not exist in BAM
+			if ! exists_region_bam(bam_reader, BED.chrom(t), BED.chromstart(t), BED.chromend(t))
+				continue
+			end
+
 			# Get read coverage of the percentile positions on a transcript
 			if max_depth == 0
-				relcov += coverage_transcript_percentile(reader, t)
+				relcov += coverage_transcript_percentile(bam_reader, t)
 			else
 				# The maximum number for (imcomplete) comaptibility with `--max-depth` parametr of `pileup()` used in RSeQC
-				relcov += min.(max_depth, coverage_transcript_percentile(reader, t))
+				relcov += min.(max_depth, coverage_transcript_percentile(bam_reader, t))
 			end
 		end
     end

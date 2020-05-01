@@ -43,15 +43,8 @@ function absolute_genebodycoverage(path_bam::String, path_bed12::String;
 	end
 	println(@sprintf "transcripts: %d" length(transcripts))
 
-	# Calculate transcript length
-	transcripts_length = zeros(Int, length(transcripts))
-	for i in 1:length(transcripts)
-		transcripts_length[i] = sum(BED.blocksizes(transcripts[i]))
-	end
-
-	# Define L_max (Maximum length of transcript)
-	L_max = 0
-	L_max = maximum(transcripts_length)
+	# Calculate L_max (Maximum length of transcript)
+	L_max = maximum(sum(BED.blocksizes(t)) for t in transcripts)
 	println(@sprintf("L_max: %d", L_max))
 
 	# Calculate K
@@ -60,12 +53,6 @@ function absolute_genebodycoverage(path_bam::String, path_bed12::String;
 
 	# Calculate number of transcripts in each bin
 	N_transcript = zeros(Int, K)
-	for L in transcripts_length
-		N_transcript[Int(ceil(L/bin_size))] += 1
-	end
-	for k in (K-1):-1:1
-		N_transcript[k] += N_transcript[k+1]
-	end
 
 	# Generate a L_max-length array for read coverage
 	cov = zeros(L_max)
@@ -79,10 +66,18 @@ function absolute_genebodycoverage(path_bam::String, path_bed12::String;
 		println("Calculate absolute read coverage for each transcript...")
 
 		for t in transcripts
+			# Skip the transcript whose region does not exist in BAM
+			if ! exists_region_bam(bam_reader, BED.chrom(t), BED.chromstart(t), BED.chromend(t))
+				continue
+			end
+
 			# Get blockSizes (= exon lengths) and blockStarts (=start position of exons relative to chromStart of t)
 			blockSizes = BED.blocksizes(t)
 			L = sum(blockSizes)
 			blockStarts = BED.blockstarts(t)
+
+			# Count the number of transcripts whose 5'-end in each bin
+			N_transcript[Int(ceil(sum(blockSizes)/bin_size))] += 1
 
 			# Strand
 			BED.strand(t)
@@ -138,6 +133,11 @@ function absolute_genebodycoverage(path_bam::String, path_bed12::String;
 				end
 			end
 		end
+	end
+
+	# Calculate number of transcripts in each bin
+	for k in (K-1):-1:1
+		N_transcript[k] += N_transcript[k+1]
 	end
 
 	# Divide count by the number of transcripts for each bin
