@@ -1,6 +1,11 @@
 
 """
-	Loads transcripts information from BED12-format file
+    load_transcript(path_bed12::String)
+
+Loads transcripts information from a BED12-format file
+
+# Arguments
+- 'path_bed12::String': the path of the file
 """
 function load_transcript(path_bed12::String)
 	transcripts = Array{BED.Record,1}()
