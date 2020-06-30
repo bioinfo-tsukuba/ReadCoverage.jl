@@ -146,7 +146,7 @@ end
 
 """
     convert2relativecoverage(converage::Array{Float64,1}, bin_number::Int)
-Converts read coverage to relative read coverage
+Converts read coverage to relative gene body coverage
 
 *future work to do (incomplete)
 """
