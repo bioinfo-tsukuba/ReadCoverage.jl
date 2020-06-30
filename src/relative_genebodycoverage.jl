@@ -167,7 +167,7 @@ end
 Finds the percentile of a list of values and returns the list of percentile of the values.
 
 # Arguments
-- 'N::Array{Int,1}': the list of values. Note N MUST BE already sorted.
+- `N::Array{Int,1}`: the list of values. Note N MUST BE already sorted.
 
 Reference: https://github.com/MonashBioinformaticsPlatform/RSeQC/blob/cb42bd90afa8d131875b18d54f70821142b8ea79/rseqc/qcmodule/mystat.py#L156
 """
