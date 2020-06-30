@@ -105,14 +105,14 @@ function coverage_transcript_percentile(bam_reader::BAM.Reader, t::BED.Record)
 	transcript_end = BED.chromend(t)
 	
 	# Collect within-exon positions relative to the transcript start
-	L = sum(block_sizes )
+	L = sum(block_sizes)
 	exon_coordinates = zeros(Int, L)
 	offset = 0
-	for i in 1:length(block_sizes ) # For each exon
-		for j in 0:(block_sizes [i]-1)
+	for i in 1:length(block_sizes) # For each exon
+		for j in 0:(block_sizes[i]-1)
 			exon_coordinates[j+offset+1] = block_starts[i] + j
 		end
-		offset += block_sizes [i]
+		offset += block_sizes[i]
 	end
 
 	# Select percentile positions (resulting in 100 positions)
