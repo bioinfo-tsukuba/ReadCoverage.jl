@@ -1,4 +1,4 @@
-function uv_access_writable(path, mode=2)
+function uv_access_writable(path, mode = 2)
     local ret
     req = Libc.malloc(Base._sizeof_uv_fs)
 	try
@@ -10,5 +10,5 @@ function uv_access_writable(path, mode=2)
     finally
         Libc.free(req)
     end
-    return ret==0
+    return ret == 0
 end

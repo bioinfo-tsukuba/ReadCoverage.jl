@@ -1,9 +1,9 @@
 export plot_absolute_coverage, plot_relative_coverage, plot_read_coverage
 
 """
-plot_absolute_coverage(abcov::Array{Float64,1}; out_path="")
+    plot_absolute_coverage(abcov::Array{Float64,1}; out_path="")
 
-Plot absolute gene body coverage.
+Plot the absolute gene body coverage.
 """
 function plot_absolute_coverage(abcov::Array{Float64,1}; out_path="")
     x = collect(1:length(abcov)) .* 100
@@ -18,9 +18,9 @@ end
 
 
 """
-plot_relative_coverage(relcov::Array{Float64,1}; out_path="")
+    plot_relative_coverage(relcov::Array{Float64,1}; out_path="")
 
-Plot relative gene body coverage.
+Plot the relative gene body coverage.
 """
 function plot_relative_coverage(relcov::Array{Float64,1}; out_path="")
     x = collect(1:length(relcov)) .* 100
@@ -36,7 +36,7 @@ end
 
 
 """
-plot_read_coverage(cov::Array{Int64,1}; out_path="")
+    plot_read_coverage(cov::Array{Int64,1}; out_path="")
 
 Plot read coverage.
 """

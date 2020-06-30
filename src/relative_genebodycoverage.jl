@@ -1,20 +1,20 @@
 export relative_genebodycoverage
 
 """
-relative_genebodycoverage(path_bam::String, path_bed12::String; 
+    relative_genebodycoverage(path_bam::String, path_bed12::String; 
 							output_prefix::String="", transcript_length_cut::Int=100, max_depth::Int=0, N_bin::Int = 100)
 
-Calculates relative gene body coverage.
+Calculates the relative gene body coverage.
 
-Arguments
+# Arguments
 ---------
-- `path_bam::String`: Path to a BAM file.
-- `path_bed12::String`: Path to a reference gene model file with BED12 format.
-- `output_prefix::String`: Prefix for output files. If this keyword is not specified or set to "" (defalut), no output files are saved.
-- `transcript_length_cut`: Minimum length of transcripts to be used for calculation (Defalut: 100)
-- `max_depth::Int`: Maximum depth for a position. Depth more than `max_depth` is cut to `max_depth`.
+- `path_bam::String`: the path to a BAM file.
+- `path_bed12::String`: the path to a reference gene model file with BED12 format.
+- `output_prefix::String`: the prefix for output files. If this keyword is not specified or set to "" (defalut), no output files are saved.
+- `transcript_length_cut`: the minimum length of transcripts to be used for calculation (Defalut: 100)
+- `max_depth::Int`: the maximum depth for a position. Depth more than `max_depth` is cut to `max_depth`.
 					If this keyword is set to 0 (defalut), no cut is occurred.
-- `N_bin::Int`: Number of bins for a transcript (Defalut: 100).
+- `N_bin::Int`: the number of bins for a transcript (Defalut: 100).
 """
 function relative_genebodycoverage(path_bam::String, path_bed12::String; 
 									output_prefix::String="", transcript_length_cut::Int=100, max_depth::Int=0, N_bin::Int = 100)
@@ -49,6 +49,7 @@ function relative_genebodycoverage(path_bam::String, path_bed12::String;
 
 		# For each transcript
 		for t in transcripts
+
 			# Skip 
 			if sum(BED.blocksizes(t)) < transcript_length_cut
 				continue
@@ -90,25 +91,28 @@ end
 
 
 """
-	Gets read coverage on the percentile positions in a transcript
-	1 read for 1 transcript
+    coverage_transcript_percentile(bam_reader::BAM.Reader, t::BED.Record)
+
+Gets read coverage on the percentile positions in a transcript
+1 read for 1 transcript
 """
 function coverage_transcript_percentile(bam_reader::BAM.Reader, t::BED.Record)
-	# Get blockSizes (= exon lengths) and blockStarts (=start position of exons relative to chromStart of t)
-	blockSizes = BED.blocksizes(t)
-	blockStarts = BED.blockstarts(t) # Returns 1-based coordinate (though 0-based in BED12 format)
+
+	# Get block_sizes  (= exon lengths) and block_starts (=start position of exons relative to chromStart of t)
+	block_sizes  = BED.blocksizes(t)
+	block_starts = BED.blockstarts(t) # Returns 1-based coordinate (though 0-based in BED12 format)
 	transcript_start = BED.chromstart(t)  # Returns 1-based coordinate(though 0-based in BED12 format)
 	transcript_end = BED.chromend(t)
 	
 	# Collect within-exon positions relative to the transcript start
-	L = sum(blockSizes)
+	L = sum(block_sizes)
 	exon_coordinates = zeros(Int, L)
 	offset = 0
-	for i in 1:length(blockSizes) # For each exon
-		for j in 0:(blockSizes[i]-1)
-			exon_coordinates[j+offset+1] = blockStarts[i] + j
+	for i in 1:length(block_sizes) # For each exon
+		for j in 0:(block_sizes[i]-1)
+			exon_coordinates[j+offset+1] = block_starts[i] + j
 		end
-		offset += blockSizes[i]
+		offset += block_sizes[i]
 	end
 
 	# Select percentile positions (resulting in 100 positions)
@@ -126,7 +130,9 @@ end
 
 
 """
-	Write result of `relative_genebodycoverage()`
+    write_relative_genebodycoverage(relative_coverage::Array{Float64,1}, path_out::String, sample_id::String)
+
+Write result of `relative_genebodycoverage()`
 """
 function  write_relative_genebodycoverage(relative_coverage::Array{Float64,1}, path_out::String, sample_id::String)
 	open(path_out, "w") do fw
@@ -139,8 +145,10 @@ end
 
 
 """
-Future
-	Converts read coverage to relative read coverage
+    convert2relativecoverage(converage::Array{Float64,1}, bin_number::Int)
+Converts read coverage to relative gene body coverage
+
+*future work to do (incomplete)
 """
 function convert2relativecoverage(converage::Array{Float64,1}, bin_number::Int)
 	relative_coverage = zeros(Float64, bin_number)
@@ -154,9 +162,13 @@ end
 
 
 """
-	Finds the percentile of a list of values.
-@parameter N - is a list of values. Note N MUST BE already sorted.
-@return - the list of percentile of the values
+    percentile_list(N::Array{Int,1})
+
+Finds the percentile of a list of values and returns the list of percentile of the values.
+
+# Arguments
+- `N::Array{Int,1}`: the list of values. Note N MUST BE already sorted.
+
 Reference: https://github.com/MonashBioinformaticsPlatform/RSeQC/blob/cb42bd90afa8d131875b18d54f70821142b8ea79/rseqc/qcmodule/mystat.py#L156
 """
 function percentile_list(N::Array{Int,1})

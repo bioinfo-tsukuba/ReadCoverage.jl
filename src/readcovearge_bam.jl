@@ -5,15 +5,15 @@ export readcoverage_transcript_bam
 	readcoverage_bam(path_bam::String, chrom::String, leftpos::Int64, rightpos::Int64;
 					output_prefix::String = "")
 
-Calculates read coverage for a genomic interval.
+Calculates a read coverage for a genomic interval.
 
-Arguments
+# Arguments
 ---------
-- `path_bam::String`: Path to a BAM file.
-- `chrom::String`: Chromosome name for a genomic interval.
-- `leftpos::Int64`: Left position for a genomic interval.
-- `rightpos::Int64`: Right position for a genomic interval.
-- `output_prefix::String`: Prefix for output files. If this keyword is not specified or set to "" (defalut), no output files are saved.
+- `path_bam::String`: the path to a BAM file.
+- `chrom::String`: the chromosome name for a genomic interval.
+- `leftpos::Int64`: the left position for a genomic interval.
+- `rightpos::Int64`: the right position for a genomic interval.
+- `output_prefix::String`: the prefix for output files. If this keyword is not specified or set to "" (defalut), no output files are saved.
 """
 function readcoverage_bam(path_bam::String, chrom::String, leftpos::Int64, rightpos::Int64; output_prefix::String = "")
 	if output_prefix != ""
@@ -32,28 +32,31 @@ function readcoverage_bam(path_bam::String, chrom::String, leftpos::Int64, right
 		end
 	end
 
-	# Define output read coverage container
+	# Define the output read coverage container
 	coverage = zeros(Int, rightpos - leftpos + 1)
 
-	# Caclutate read coverage
+	# Caclutate the read coverage
 	open(BAM.Reader, path_bam, index=path_bam*".bai") do bam_reader
+
 		# Check wheteher the region exists in BAM
 		if ! exists_region_bam(bam_reader, chrom, leftpos, rightpos)
 			error("The region does not exist in the BAM file.")
 		end
+
         coverage = readcoverage_bam_base(bam_reader, chrom, leftpos, rightpos)
 	end
 	
 	if output_prefix != ""
+
 		# Write output (TSV) (Position, Coverage)
 		println("Write results...")
-		binNumbers = collect(leftpos:rightpos)
+		bin_numbers = collect(leftpos:rightpos)
 		open(path_out, "w") do io
-			writedlm(io, [binNumbers coverage], '\t')
+			writedlm(io, [bin_numbers coverage], '\t')
 		end
 		
 		# Save plot
-		plot_read_coverage(coverage, out_path=path_out_plot)
+		plot_read_coverage(coverage, out_path = path_out_plot)
 
 		# Message
 		println(@sprintf "Finished! Check output files:\n- %s\n- %s" path_out path_out_plot)
@@ -66,7 +69,7 @@ end
 """
 	readcoverage_bam_base(bam_reader::BAM.Reader, chrom::String, leftpos::Int64, rightpos::Int64)
 
-Generates read coverage for a genomic interval.
+Generates the read coverage for a genomic interval.
 Both `leftpos` and `rightpos` coordinates are assumed to be 1-based.
 """
 function readcoverage_bam_base(bam_reader::BAM.Reader, chrom::String, leftpos::Int64, rightpos::Int64)
@@ -75,38 +78,42 @@ function readcoverage_bam_base(bam_reader::BAM.Reader, chrom::String, leftpos::I
 
 	# Evaluate each BAM record
 	for record in eachoverlap(bam_reader, chrom, leftpos:rightpos)
+
         # Skip a BAM record for an unmapped read (if pileupread.alignment.is_unmapped:continue)
 		if ! BAM.ismapped(record)
 			continue
         end
+
         # Compatibility with RSeQC genebody_coverage.py
         ## if pileupread.alignment.is_secondary:continue
         if BAM.flag(record) & SAM.FLAG_SECONDARY != 0
             continue
         end
+
         ## if pileupread.alignment.is_qcfail:continue 
         if BAM.flag(record) & SAM.FLAG_QCFAIL != 0
             continue
         end
+
         ## if pileupread.alignment.is_duplicate:continue
         if BAM.flag(record) & SAM.FLAG_DUP != 0
             continue
         end           
         
-		readLeftPos = BAM.position(record)
+		read_leftpos = BAM.position(record)
 		cigarRle = BAM.cigar_rle(record)
 		offset = 0
 
 		# Decode CIGAR string to get coverage of split-aligned reads
 		for i in 1:length(cigarRle[1])
 			if cigarRle[1][i] == OP_MATCH
-				if leftpos <= readLeftPos + offset <= rightpos
-					for j in 1:min(cigarRle[2][i], rightpos - readLeftPos - offset + 1)
-						coverage[readLeftPos + offset + j - leftpos] += 1
+				if leftpos <= read_leftpos + offset <= rightpos
+					for j in 1:min(cigarRle[2][i], rightpos - read_leftpos - offset + 1)
+						coverage[read_leftpos + offset + j - leftpos] += 1
 					end
-				elseif readLeftPos + offset < leftpos
-					for j in (leftpos-(readLeftPos + offset)+1):min(cigarRle[2][i], rightpos - readLeftPos - offset + 1)
-						coverage[readLeftPos + offset + j - leftpos] += 1
+				elseif read_leftpos + offset < leftpos
+					for j in (leftpos-(read_leftpos + offset)+1):min(cigarRle[2][i], rightpos - read_leftpos - offset + 1)
+						coverage[read_leftpos + offset + j - leftpos] += 1
 					end
 				end
 			end
@@ -124,17 +131,18 @@ end
 Returns read coverage for a transcript.
 """
 function readcoverage_transcript_bam(bam_reader::BAM.Reader, t::BED.Record)
+
 	# Check if the region of the transcript exists in BAM
 	if ! exists_region_bam(bam_reader, BED.chrom(t), BED.chromstart(t), BED.chromend(t))
 		error("The transcript region does not exist in the BAM file.")
 	end
 
-	# Get blockSizes (= exon lengths) and blockStarts (=start position of exons relative to chromStart of t)
-	blockSizes = BED.blocksizes(t)
-	L = sum(blockSizes)
-	blockStarts = BED.blockstarts(t)
+	# Get block_sizes (= exon lengths) and block_starts (=start position of exons relative to chromStart of t)
+	block_sizes = BED.block_sizes(t)
+	transcript_length = sum(block_sizes)
+	block_starts = BED.block_starts(t)
 
-	coverage = zeros(Float64, L)
+	coverage = zeros(Float64, transcript_length)
 
 	# Get the read coverage on each exon and save it to `cov`
 	# Note: Read coverage is saved in `cov` in a 'Left justified' manner,
@@ -145,20 +153,21 @@ function readcoverage_transcript_bam(bam_reader::BAM.Reader, t::BED.Record)
 	s_g = BED.chromstart(t) + 1
 	e_g = 0
 
-	for i in 1:length(blockSizes) # For each exon
+	for i in 1:length(block_sizes) # For each exon
+	
 		# Calculate start and end positions of an exon on the genome
-		s_g = blockStarts[i] + s_g
-		e_g = s_g + blockSizes[i] - 1
+		s_g = block_starts[i] + s_g
+		e_g = s_g + block_sizes[i] - 1
 
 		# Calculate start and end positions of an exon on mRNA
 		p_start = p_end + 1
-		p_end = p_start + blockSizes[i] - 1
+		p_end = p_start + block_sizes[i] - 1
 
 		# Get read coverage and save it
 		if BED.strand(t) == STRAND_POS
 			pos_cov = p_start:p_end
 		elseif BED.strand(t) == STRAND_NEG
-			pos_cov = (L-p_start+1):-1:(L-p_end+1)
+			pos_cov = (transcript_length-p_start+1):-1:(transcript_length-p_end+1)
 		else # STRAND_NA, STRAND_BOTH
 			continue
 		end
@@ -183,14 +192,14 @@ function bamToCoverage_cigarAware_position(bam_reader::BAM.Reader, chrom::String
 			continue
 		end
 
-		readLeftPos = BAM.position(record)
+		read_leftpos = BAM.position(record)
 		cigarRle = BAM.cigar_rle(record)
 		offset = 0
 
 		# Decode CIGAR string to get coverage of split-aligned reads
 		for i in 1:length(cigarRle[1])
 			if cigarRle[1][i] == OP_MATCH
-				if readLeftPos + offset <= pos && pos <= readLeftPos + offset + cigarRle[2][i] - 1
+				if read_leftpos + offset <= pos && pos <= read_leftpos + offset + cigarRle[2][i] - 1
 					coverage += 1
 				end
 			end

@@ -1,12 +1,12 @@
 export absolute_genebodycoverage
 
 """
-absolute_genebodycoverage(path_bam::String, path_bed12::String;
+    absolute_genebodycoverage(path_bam::String, path_bed12::String;
 							output_prefix::String = "", bin_size::Int=100)
 
 Calculates absolute gene body coverage.
 
-Arguments
+# Arguments
 ---------
 - `path_bam::String`: Path to a BAM file.
 - `path_bed12::String`: Path to a reference gene model file with BED12 format.
@@ -51,17 +51,18 @@ function absolute_genebodycoverage(path_bam::String, path_bed12::String;
 	K = Int(ceil(L_max/bin_size))
 	println(@sprintf("K: %d", K))
 
-	# Calculate number of transcripts in each bin
+	# Calculate the number of transcripts in each bin
 	N_transcript = zeros(Int, K)
 
 	# Generate a L_max-length array for read coverage
-	cov = zeros(L_max)
+	coverage = zeros(L_max)
 
 	# Generate a K-length array for absolute coverage
 	abcov = zeros(K)
 
 	# Open BAM file
 	open(BAM.Reader, path_bam, index=path_bam*".bai") do bam_reader
+	
 		# For each transcript
 		println("Calculate absolute read coverage for each transcript...")
 
@@ -83,13 +84,13 @@ function absolute_genebodycoverage(path_bam::String, path_bed12::String;
 			BED.strand(t)
 
 
-			# Initialize cov
-			for p in 1:length(cov)
-				cov[p] = 0
+			# Initialize coverage
+			for p in 1:length(coverage)
+				coverage[p] = 0
 			end
 
-			# Get the read coverage on each exon and save it to `cov`
-			# Note: Read coverage is saved in `cov` in a 'Left justified' manner,
+			# Get the read coverage on each exon and save it to `coverage`
+			# Note: Read coverage is saved in `coverage` in a 'Left justified' manner,
 			#       and left is 5'-end.
 			# If the strand of a transcript is '-' STRAND_NEG, read coverage was reversed.
 			p_start = 1
@@ -114,7 +115,7 @@ function absolute_genebodycoverage(path_bam::String, path_bed12::String;
 					continue
 				end
 
-				cov[pos_cov] = readcoverage_bam_base(bam_reader, BED.chrom(t), exon_start, exon_end)
+				coverage[pos_cov] = readcoverage_bam_base(bam_reader, BED.chrom(t), exon_start, exon_end)
 			end
 
 			# Calculate count per bin
@@ -122,12 +123,12 @@ function absolute_genebodycoverage(path_bam::String, path_bed12::String;
 			# (k-th bin: [(k-1)*b+1, k*b])
 			for k in 1:K # for each bin
 				if k*bin_size > L # Case when k-th bin exceeds boundary of transcript
-					if sum(cov[1:(L-((k-1)*bin_size+1)+1)]) > 0
+					if sum(coverage[1:(L-((k-1)*bin_size+1)+1)]) > 0
 						abcov[k] += 1
 						break
 					end
 				else
-					if sum(cov[(L-k*bin_size+1):(L-((k-1)*bin_size+1)+1)]) > 0
+					if sum(coverage[(L-k*bin_size+1):(L-((k-1)*bin_size+1)+1)]) > 0
 						abcov[k] += 1
 					end
 				end
@@ -148,11 +149,11 @@ function absolute_genebodycoverage(path_bam::String, path_bed12::String;
 	if output_prefix != ""
 		# Write output (TSV) (Sample_ID, Bin, Coverage)
 		println("Write results...")
-		binNumbers = collect(1:K)
-		binStarts = (binNumbers .- 1) .* bin_size .+ 1
-		binEnds = binNumbers .* bin_size
+		bin_numbers = collect(1:K)
+		bin_starts = (bin_numbers .- 1) .* bin_size .+ 1
+		bin_ends = bin_numbers .* bin_size
 		open(path_out, "w") do io
-			writedlm(io, [binNumbers binStarts binEnds abcov N_transcript], '\t')
+			writedlm(io, [bin_numbers bin_starts bin_ends abcov N_transcript], '\t')
 		end
 		
 		# Save plot
