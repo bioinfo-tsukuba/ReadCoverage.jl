@@ -13,7 +13,7 @@ pkg> add https://github.com/bioinfo-tsukuba/ReadCoverage.jl
 using ReadCoverage
 
 path_bam = "examples/RamDA_72h_A09.uniq.q40.bam"
-path_bed12 = "examples/gencode.vM15.primary_assembly.annotation.protein_coding.head.bed"
+path_bed12 = "examples/data/gencode.vM15.primary_assembly.annotation.protein_coding.head.bed"
 out_prefix = "examples/out/RamDA_72h_A09.uniq.q40"
 ```
 
@@ -38,6 +38,7 @@ plot_absolute_coverage(abcov)
 
 
 ### Relative genebody coverage
+
 ```
 relcov = relative_genebodycoverage(path_bam, path_bed12);
 
@@ -45,6 +46,20 @@ max_depth = 0
 relcov = relative_genebodycoverage(path_bam, path_bed12, output_prefix=out_prefix, max_depth=max_depth);
 plot_relative_coverage(relcov)
 ```
+
+### Variability of Depth of Coverage (VDoC) score
+
+```
+array_path_bam = [
+    "examples/data/RamDA_72h_A09.uniq.q40.bam",
+    "data/RamDA_72h_A10.uniq.q40.bam",
+    "data/RamDA_72h_A11.uniq.q40.bam"
+]
+path_bed12 = "examples/data/gencode.vM15.primary_assembly.annotation.protein_coding.head.bed"
+
+array_transcript_name, array_transcript_length, array_vdoc = calc_vdoc(array_path_bam, path_bed12)
+```
+
 
 ### CLI (Commad line interface)
 
