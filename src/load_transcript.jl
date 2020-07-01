@@ -1,3 +1,4 @@
+export load_transcript
 
 """
     load_transcript(path_bed12::String)
