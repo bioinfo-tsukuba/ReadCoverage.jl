@@ -6,3 +6,4 @@ examples/data/
 *.bam
 *.bam.bai
 *.bed
+zzz_labnotebooks/
