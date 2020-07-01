@@ -4,8 +4,6 @@ ReadCoverage.jl is a fast tool to calculate absolute and relative gene body cove
 ## Installation
 
 ```
-pkg> registry add https://github.com/BioJulia/BioJuliaRegistry.git
-
 pkg> add https://github.com/bioinfo-tsukuba/ReadCoverage.jl
 ```
 
