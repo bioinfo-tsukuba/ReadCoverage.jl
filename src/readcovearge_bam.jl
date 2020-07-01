@@ -138,9 +138,9 @@ function readcoverage_transcript_bam(bam_reader::BAM.Reader, t::BED.Record)
 	end
 
 	# Get block_sizes (= exon lengths) and block_starts (=start position of exons relative to chromStart of t)
-	block_sizes = BED.block_sizes(t)
+	block_sizes = BED.blocksizes(t)
 	transcript_length = sum(block_sizes)
-	block_starts = BED.block_starts(t)
+	block_starts = BED.blockstarts(t)
 
 	coverage = zeros(Float64, transcript_length)
 
