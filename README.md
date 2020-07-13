@@ -61,7 +61,7 @@ array_transcript_name, array_transcript_length, array_vdoc = calc_vdoc(array_pat
 ```
 
 
-### CLI (Commad line interface)
+## CLI (Commad line interface)
 
 ```
 pkg> add ArgParse
@@ -72,3 +72,13 @@ pkg> add ArgParse
 $ julia cli/run.jl relcov <BAM> <BED12> <output_prefix>
 ```
 
+## Docker
+
+The Docker image is available on [Docker Hub](https://hub.docker.com/r/yuifu/readcoverage.jl).
+
+You can run ReadCoverage.jl via CLI.
+
+```
+docker run yuifu/readcoverage.jl:0.1.2 \
+  julia /opt/run.jl relcov <BAM> <BED12> <output_prefix>
+```
