@@ -25,7 +25,7 @@ function vdoc(array_path_bam::Array{String,1}, path_bed12::String;
 	if output_prefix != ""
 		path_out = output_prefix * ".vdoc.txt"
 		path_out_plot = output_prefix * ".vdoc.pdf"
-		println(@sprintf "Start calculating absolute gene body coverage...\n- bam: %s\n- bed12: %s\n- output: %s\n          %s\n- bin_size: %d\n" path_bam path_bed12 path_out path_out_plot bin_size)
+		println(@sprintf "Start calculating absolute gene body coverage...\n- bam: %s\n- bed12: %s\n- output: %s\n          %s\n" join(array_path_bam, ", ") path_bed12 path_out path_out_plot)
 	end
 
 	# File check
