@@ -79,9 +79,6 @@ function vdoc(array_path_bam::Array{String,1}, path_bed12::String;
 	if output_prefix != ""
 		# Write output (TSV) (Sample_ID, Bin, Coverage)
 		println("Write results...")
-		bin_numbers = collect(1:K)
-		bin_starts = (bin_numbers .- 1) .* bin_size .+ 1
-		bin_ends = bin_numbers .* bin_size
 		open(path_out, "w") do io
 			writedlm(io, [array_transcript_name array_transcript_length array_vdoc], '\t')
 		end
