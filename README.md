@@ -12,7 +12,7 @@ pkg> add https://github.com/bioinfo-tsukuba/ReadCoverage.jl
 ```
 using ReadCoverage
 
-path_bam = "examples/RamDA_72h_A09.uniq.q40.bam"
+path_bam = "examples/data/RamDA_72h_A09.uniq.q40.bam"
 path_bed12 = "examples/data/gencode.vM15.primary_assembly.annotation.protein_coding.head.bed"
 out_prefix = "examples/out/RamDA_72h_A09.uniq.q40"
 ```
@@ -52,8 +52,8 @@ plot_relative_coverage(relcov)
 ```
 array_path_bam = [
     "examples/data/RamDA_72h_A09.uniq.q40.bam",
-    "data/RamDA_72h_A10.uniq.q40.bam",
-    "data/RamDA_72h_A11.uniq.q40.bam"
+    "examples/data/RamDA_72h_A10.uniq.q40.bam",
+    "examples/data/RamDA_72h_A11.uniq.q40.bam"
 ]
 path_bed12 = "examples/data/gencode.vM15.primary_assembly.annotation.protein_coding.head.bed"
 
@@ -78,7 +78,16 @@ The Docker image is available on [Docker Hub](https://hub.docker.com/r/yuifu/rea
 
 You can run ReadCoverage.jl via CLI.
 
+### `relcov`
+
 ```
 docker run yuifu/readcoverage.jl:0.1.2 \
   julia /opt/run.jl relcov <BAM> <BED12> <output_prefix>
+```
+
+### `vdoccov`
+
+```
+docker run yuifu/readcoverage.jl:0.1.2 \
+  julia /opt/run.jl vdoc <BED12> <output_prefix> <BAM1> <BAM2> ...
 ```

@@ -16,6 +16,9 @@ function parse_commandline()
         "coverage"    
             help = "Cacluates absolute gene body coverage from a BAM file."
             action = :command
+        "vdoc"
+            help = "Calculates Variability of Depth of Coverage (VDoC) score across samples."
+            action = :command
     end
 
     @add_arg_table! s["relcov"] begin
@@ -55,6 +58,7 @@ function parse_commandline()
             arg_type = Int
             default = 100 
     end
+
     @add_arg_table! s["coverage"] begin
         "path_bam"
             help = "Path to a BAM file."
@@ -77,6 +81,23 @@ function parse_commandline()
             arg_type = String
             required = true
     end
+
+    @add_arg_table! s["vdoc"] begin
+        "path_bed12"
+            help = "Path to a reference gene model file with BED12 format."
+            arg_type = String
+            required = true
+        "output_prefix"
+            help = "Prefix for output files. If not specified or set to \"\" (defalut), no output files are saved."
+            arg_type = String
+            required = true
+        "path_bam"
+            help = "Path to a BAM file."
+            arg_type = String
+            required = true
+            nargs = '+'
+    end
+    
     return parse_args(s)
 end
 
@@ -106,8 +127,13 @@ function main()
             parsed_args["coverage"]["rightpos"],
             output_prefix = parsed_args["coverage"]["output_prefix"]
         );
+    elseif parsed_args["%COMMAND%"] == "vdoc"
+        vdoc(
+            parsed_args["vdoc"]["path_bam"], 
+            parsed_args["vdoc"]["path_bed12"], 
+            output_prefix = parsed_args["vdoc"]["output_prefix"]
+        );
     end
-
 end
 
 main()
