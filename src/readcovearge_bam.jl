@@ -76,51 +76,54 @@ function readcoverage_bam_base(bam_reader::BAM.Reader, chrom::String, leftpos::I
 	# Define output read coverage container
 	coverage = zeros(Int, rightpos - leftpos + 1)
 
-	# Evaluate each BAM record
-	for record in eachoverlap(bam_reader, chrom, leftpos:rightpos)
+	try
+		# Evaluate each BAM record
+		for record in eachoverlap(bam_reader, chrom, leftpos:rightpos)
 
-        # Skip a BAM record for an unmapped read (if pileupread.alignment.is_unmapped:continue)
-		if ! BAM.ismapped(record)
-			continue
-        end
+			# Skip a BAM record for an unmapped read (if pileupread.alignment.is_unmapped:continue)
+			if ! BAM.ismapped(record)
+				continue
+			end
 
-        # Compatibility with RSeQC genebody_coverage.py
-        ## if pileupread.alignment.is_secondary:continue
-        if BAM.flag(record) & SAM.FLAG_SECONDARY != 0
-            continue
-        end
+			# Compatibility with RSeQC genebody_coverage.py
+			## if pileupread.alignment.is_secondary:continue
+			if BAM.flag(record) & SAM.FLAG_SECONDARY != 0
+				continue
+			end
 
-        ## if pileupread.alignment.is_qcfail:continue 
-        if BAM.flag(record) & SAM.FLAG_QCFAIL != 0
-            continue
-        end
+			## if pileupread.alignment.is_qcfail:continue 
+			if BAM.flag(record) & SAM.FLAG_QCFAIL != 0
+				continue
+			end
 
-        ## if pileupread.alignment.is_duplicate:continue
-        if BAM.flag(record) & SAM.FLAG_DUP != 0
-            continue
-        end           
-        
-		read_leftpos = BAM.position(record)
-		cigarRle = BAM.cigar_rle(record)
-		offset = 0
+			## if pileupread.alignment.is_duplicate:continue
+			if BAM.flag(record) & SAM.FLAG_DUP != 0
+				continue
+			end           
+			
+			read_leftpos = BAM.position(record)
+			cigarRle = BAM.cigar_rle(record)
+			offset = 0
 
-		# Decode CIGAR string to get coverage of split-aligned reads
-		for i in 1:length(cigarRle[1])
-			if cigarRle[1][i] == OP_MATCH
-				if leftpos <= read_leftpos + offset <= rightpos
-					for j in 1:min(cigarRle[2][i], rightpos - read_leftpos - offset + 1)
-						coverage[read_leftpos + offset + j - leftpos] += 1
-					end
-				elseif read_leftpos + offset < leftpos
-					for j in (leftpos-(read_leftpos + offset)+1):min(cigarRle[2][i], rightpos - read_leftpos - offset + 1)
-						coverage[read_leftpos + offset + j - leftpos] += 1
+			# Decode CIGAR string to get coverage of split-aligned reads
+			for i in 1:length(cigarRle[1])
+				if cigarRle[1][i] == OP_MATCH
+					if leftpos <= read_leftpos + offset <= rightpos
+						for j in 1:min(cigarRle[2][i], rightpos - read_leftpos - offset + 1)
+							coverage[read_leftpos + offset + j - leftpos] += 1
+						end
+					elseif read_leftpos + offset < leftpos
+						for j in (leftpos-(read_leftpos + offset)+1):min(cigarRle[2][i], rightpos - read_leftpos - offset + 1)
+							coverage[read_leftpos + offset + j - leftpos] += 1
+						end
 					end
 				end
+				offset += cigarRle[2][i]
 			end
-			offset += cigarRle[2][i]
 		end
+	catch e
+		println("Catched and ignored an error: ", typeof(e))
 	end
-
 	return(coverage)
 end
 
