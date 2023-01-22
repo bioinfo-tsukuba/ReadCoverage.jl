@@ -7,7 +7,6 @@ using BioAlignments
 using DelimitedFiles
 using Printf
 using Plots
-using PyPlot
 using Statistics
 using GZip
 
