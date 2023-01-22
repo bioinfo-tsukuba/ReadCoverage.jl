@@ -103,6 +103,11 @@ end
 
 
 function main()
+    if length(ARGS) == 0
+        println("Please specify a command.")
+        return
+    end
+
     parsed_args = parse_commandline()
 
     if parsed_args["%COMMAND%"] == "relcov"
