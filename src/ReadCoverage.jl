@@ -9,6 +9,7 @@ using Printf
 using Plots
 using PyPlot
 using Statistics
+using GZip
 
 include("relative_genebodycoverage.jl")
 include("readcovearge_bam.jl")
