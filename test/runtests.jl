@@ -11,8 +11,8 @@ end
 
 
 
-# path_bam = "examples/RamDA_72h_A09.uniq.q40.bam"
-# path_bed12 = "examples/gencode.vM15.primary_assembly.annotation.protein_coding.head.bed"
+# path_bam = "examples/data/RamDA_72h_A09.uniq.q40.bam"
+# path_bed12 = "examples/data/gencode.vM15.primary_assembly.annotation.protein_coding.head.bed"
 # out_prefix = "examples/out/RamDA_72h_A09.uniq.q40"
 # chrom = "chr19"
 # leftpos = 3205000
