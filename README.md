@@ -1,15 +1,16 @@
 # ReadCoverage.jl
+
 ReadCoverage.jl is a fast tool to calculate absolute and relative gene body coverage of bulk/single-cell RNA-seq data.
 
 ## Installation
 
-```
+```julia
 pkg> add https://github.com/bioinfo-tsukuba/ReadCoverage.jl
 ```
 
 ## Usage
 
-```
+```julia
 using ReadCoverage
 
 path_bam = "examples/data/RamDA_72h_A09.uniq.q40.bam"
@@ -19,7 +20,7 @@ out_prefix = "examples/out/RamDA_72h_A09.uniq.q40"
 
 ### Read coverage
 
-```
+```julia
 chrom = "chr19"
 leftpos = 3205000
 rightpos = 3207000
@@ -30,7 +31,7 @@ plot_read_coverage(cov)
 
 ### Absolute genebody coverage
 
-```
+```julia
 abcov = absolute_genebodycoverage(path_bam, path_bed12)
 abcov = absolute_genebodycoverage(path_bam, path_bed12, output_prefix=out_prefix, bin_size=100)
 plot_absolute_coverage(abcov)
@@ -39,7 +40,7 @@ plot_absolute_coverage(abcov)
 
 ### Relative genebody coverage
 
-```
+```julia
 relcov = relative_genebodycoverage(path_bam, path_bed12);
 
 max_depth = 0
@@ -49,7 +50,7 @@ plot_relative_coverage(relcov)
 
 ### Variability of Depth of Coverage (VDoC) score
 
-```
+```julia
 array_path_bam = [
     "examples/data/RamDA_72h_A09.uniq.q40.bam",
     "examples/data/RamDA_72h_A10.uniq.q40.bam",
@@ -63,13 +64,12 @@ array_transcript_name, array_transcript_length, array_vdoc = calc_vdoc(array_pat
 
 ## CLI (Commad line interface)
 
-```
+```julia
 pkg> add ArgParse
 ```
 
-
-```
-$ julia cli/run.jl relcov <BAM> <BED12> <output_prefix>
+```bash
+julia cli/run.jl relcov <BAM> <BED12> <output_prefix>
 ```
 
 ## Docker
@@ -80,14 +80,14 @@ You can run ReadCoverage.jl via CLI.
 
 ### `relcov`
 
-```
+```bash
 docker run yuifu/readcoverage.jl:0.1.2 \
   julia /opt/run.jl relcov <BAM> <BED12> <output_prefix>
 ```
 
 ### `vdoccov`
 
-```
+```julia
 docker run yuifu/readcoverage.jl:0.1.2 \
   julia /opt/run.jl vdoc <BED12> <output_prefix> <BAM1> <BAM2> ...
 ```
