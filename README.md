@@ -74,9 +74,31 @@ julia cli/run.jl relcov <BAM> <BED12> <output_prefix>
 
 ## Docker
 
+### Build Docker image
+
+```bash
+cd scripts/docker
+docker build -t harukao/readcoverage.jl:0.1.3 .
+```
+
+### Pull Docker image
+
 The Docker image is available on [Docker Hub](https://hub.docker.com/r/yuifu/readcoverage.jl).
 
+```bash
+docker pull yuifu/readcoverage.jl:0.1.3
+```
+
+### UUse Docker image
+
 You can run ReadCoverage.jl via CLI.
+
+```bash
+docker run --rm harukao/readcoverage.jl:0.1.3 -h
+
+docker run --rm harukao/readcoverage.jl:0.1.3 abcov test_data/RamDA_72h_A09.uniq.q40.bam test_data/gencode.vM15.primary_assembly.annotation.protein_coding.head.bed products/test_abcov
+```
+
 
 ### `relcov`
 
