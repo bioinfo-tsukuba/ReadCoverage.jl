@@ -4,13 +4,14 @@ authors = ["Haruka Ozaki <harukao.cb@gmail.com>", "Tsubasa Takamuku <Tsubasa Tak
 version = "0.1.2"
 
 [deps]
+ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
 BED = "8e4a8c10-cb6b-11e8-08d2-83478d609d67"
 BioAlignments = "00701ae9-d1dc-5365-b64a-a3a3ebf5695e"
 DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
+GZip = "92fee26a-97fe-5a0c-ad85-20a5f3185b63"
 GenomicFeatures = "899a7d2d-5c61-547b-bef9-6698a8d05446"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 PyPlot = "d330b81b-6aea-500a-939a-2ce795aea3ee"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 XAM = "d759349c-bcba-11e9-07c2-5b90f8f05f7c"
