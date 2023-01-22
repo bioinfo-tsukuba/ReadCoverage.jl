@@ -1,7 +1,7 @@
 name = "ReadCoverage"
 uuid = "777a009e-283b-4c19-90b0-4d777a89162b"
 authors = ["Haruka Ozaki <harukao.cb@gmail.com>", "Tsubasa Takamuku <Tsubasa Takamuku h5gachapin1069@gmail.com>"]
-version = "0.1.2"
+version = "0.1.3"
 
 [deps]
 ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
